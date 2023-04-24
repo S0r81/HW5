@@ -50,7 +50,7 @@ public class gameFrame extends JFrame {
         var menuBar = new JMenuBar(); // Top menu Bar
         var menuPanel = new JPanel(); // Panel within Bar
         menuPanel.setLayout(new BorderLayout());
-        menuPanel.add(new JLabel("Game"), BorderLayout.WEST);
+        menuPanel.add(new JLabel("     Game"), BorderLayout.WEST); // added Spacing for better viewing
 
         // toolbar ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         JToolBar toolbar = new JToolBar();
@@ -114,8 +114,9 @@ public class gameFrame extends JFrame {
             this.dispose();
         });
 
+        // EDIT this for Network Connection
         btn4.addActionListener(e -> {
-            System.out.println("Connection Button Pressed");
+            System.out.println("Connection Button Pressed TEST");
         });
 
         toolbar.add(btn);
