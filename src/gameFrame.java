@@ -57,25 +57,29 @@ public class gameFrame extends JFrame {
         JButton btn = new JButton();
         JButton btn2 = new JButton();
         JButton btn3 = new JButton();
-        JButton btn4 = new JButton();
+        JButton btn4 = new JButton(); // p2p
 
         // Button Icons are incredibly microwaved but couldn't figure out how to resize button so resize image
         ImageIcon playIcon = new ImageIcon("res/PlayButton2Resized.png");
         ImageIcon aboutIcon = new ImageIcon("res/About.png");
         ImageIcon exitIcon = new ImageIcon("res/exit.png");
+        ImageIcon ConnectIcon = new ImageIcon("res/ConnectSmall.png");
         btn.setFocusable(false);
         btn2.setFocusable(false);
         btn3.setFocusable(false);
+        btn4.setFocusable(false);
 
         // Icons
         btn.setIcon(playIcon);
         btn2.setIcon(aboutIcon);
         btn3.setIcon(exitIcon);
+        btn4.setIcon(ConnectIcon);
 
         // TooltipText
         btn.setToolTipText("Start New Game"); // MUST START NEW GAME
         btn2.setToolTipText("About info");
         btn3.setToolTipText("Exit");
+        btn4.setToolTipText("Connect");
 
         // Button Actions (!EDIT THESE FOR FUTURE ACTIONS!)
         btn.addActionListener(e -> {
@@ -110,9 +114,14 @@ public class gameFrame extends JFrame {
             this.dispose();
         });
 
+        btn4.addActionListener(e -> {
+            System.out.println("Connection Button Pressed");
+        });
+
         toolbar.add(btn);
         toolbar.add(btn2);
         toolbar.add(btn3);
+        toolbar.add(btn4);
         menuPanel.add(toolbar, BorderLayout.SOUTH);
         // end Toolbar ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
