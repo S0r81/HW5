@@ -5,6 +5,7 @@ public class gameFrame extends JFrame {
     private final static Dimension DEFAULT_DIMENSION = new Dimension(400, 600);
 
     private Board board;
+    private NetworkAdapter networkAdapter;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
