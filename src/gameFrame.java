@@ -1,11 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 // To-do, progress whose turn it is, About button
 public class gameFrame extends JFrame {
     private final static Dimension DEFAULT_DIMENSION = new Dimension(400, 600);
 
     private Board board;
-    private NetworkAdapter networkAdapter;
+    private P2PGame p2pGame;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
@@ -83,19 +87,41 @@ public class gameFrame extends JFrame {
         btn4.setToolTipText("Connect");
 
         // Button Actions (!EDIT THESE FOR FUTURE ACTIONS!)
-        btn.addActionListener(e -> {
-            // if game already running
-            if(isVisible){
-                int answer = JOptionPane.showConfirmDialog(null, "Are you sure you'd like to start a new game?", "Confirmation", JOptionPane.YES_NO_OPTION);
-                // yes = 0, no = 1, X = -1
-                if(answer == 0){
-                    board.clear();
-                    isVisible = false;
-                    mainPanel.setVisible(isVisible);
-                    optionList.setEnabled(true);
+        btn4.addActionListener(e -> {
+            if (p2pGame == null) {
+                int choice = JOptionPane.showOptionDialog(this, "Choose role:", "Role Selection", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{"Server", "Client"}, null);
+                if (choice == 0 || choice == 1) {
+                    String serverIp = JOptionPane.showInputDialog(this, "Enter server IP address:");
+                    int serverPort = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter server port:"));
+                    if (choice == 0) { // Server
+                        try {
+                            ServerSocket serverSocket = new ServerSocket(serverPort);
+                            System.out.println("Server started on port: " + serverSocket.getLocalPort());
+                            System.out.println("Waiting for client to connect...");
+                            Socket clientSocket = serverSocket.accept();
+                            P2PGame game = new P2PGame(true, clientSocket, this::onConnected);
+                            p2pGame = game;
+                            game.start();
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(this, "Could not start server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else { // Client
+                        try {
+                            Socket socket = new Socket(serverIp, serverPort);
+                            P2PGame game = new P2PGame(false, socket, this::onConnected);
+                            p2pGame = game;
+                            game.start();
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(this, "Could not connect to server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
                 }
             }
         });
+
+
+
+
 
         btn2.addActionListener(e -> {
             System.out.println("About selected");
@@ -162,6 +188,15 @@ public class gameFrame extends JFrame {
         // put them together
         menuBar.add(menuPanel);
         setJMenuBar(menuBar);
+    }
+
+    private void onConnected() {
+        SwingUtilities.invokeLater(() -> {
+            board.clear();
+            isVisible = true;
+            mainPanel.setVisible(isVisible);
+            optionList.setEnabled(false);
+        });
     }
 
     /** create Player objects */
