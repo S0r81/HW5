@@ -3,7 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class P2PGame{
+public class P2PGame {
 
     private boolean isServer;
     private ServerSocket serverSocket;
@@ -45,12 +45,15 @@ public class P2PGame{
     }
 
     public void start() {
-        if (isServer) {
-            startServer();
-        } else {
-            startClient();
-        }
+        new Thread(() -> {
+            if (isServer) {
+                startServer();
+            } else {
+                startClient();
+            }
+        }).start();
     }
+
 
     private void init(Socket socket) {
         try {
@@ -154,7 +157,10 @@ public class P2PGame{
     }
 
     public void sendMove(int x, int y) {
-        sendMessage("MOVE:" + x + ":" + y);
-        isLocalPlayerTurn = !isLocalPlayerTurn;
+        if (outputStream != null) {
+            sendMessage(x + "," + y);
+        } else {
+            System.err.println("Output stream not initialized. Cannot send move.");
+        }
     }
 }
