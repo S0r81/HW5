@@ -17,8 +17,9 @@ public class P2PGame extends NetworkAdapter {
     private Player remotePlayer;
     private boolean isLocalPlayerTurn;
 
-    public P2PGame(boolean isServer, Socket socket, Runnable onConnectedCallback) {
+    public P2PGame(boolean isServer, Socket socket, Runnable onConnectedCallback, gameFrame gameFrame) {
         super(socket);
+        this.gameFrame = gameFrame;
         this.isServer = isServer;
         this.onConnectedCallback = onConnectedCallback;
         board = gameFrame.getBoard();

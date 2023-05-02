@@ -90,7 +90,8 @@ public class gameFrame extends JFrame {
                             System.out.println("Server started on port: " + serverSocket.getLocalPort());
                             System.out.println("Waiting for client to connect...");
                             Socket clientSocket = serverSocket.accept();
-                            P2PGame game = new P2PGame(true, clientSocket, this::onConnected);
+                            // Server
+                            P2PGame game = new P2PGame(true, clientSocket, this::onConnected, this);
                             p2pGame = game;
                             game.start();
                         } catch (IOException ex) {
@@ -99,7 +100,7 @@ public class gameFrame extends JFrame {
                     } else { // Client
                         try {
                             Socket socket = new Socket(serverIp, serverPort);
-                            P2PGame game = new P2PGame(false, socket, this::onConnected);
+                            P2PGame game = new P2PGame(false, socket, this::onConnected, this);
                             p2pGame = game;
                             game.start();
                         } catch (IOException ex) {
