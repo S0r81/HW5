@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-// To-do, progress whose turn it is, About button
 public class gameFrame extends JFrame {
     private final static Dimension DEFAULT_DIMENSION = new Dimension(400, 600);
 
@@ -14,13 +13,11 @@ public class gameFrame extends JFrame {
     private Player player2;
     private Player currentPlayer;
 
-    // Global Var to access in other methods
     JPanel mainPanel = new JPanel(new GridBagLayout());
     String[] options = {"Human", "Computer"};
     JComboBox optionList = new JComboBox(options);
     boolean isVisible = false;
 
-    /** create Game panel */
     public gameFrame() {
         this(DEFAULT_DIMENSION);
     }
@@ -31,40 +28,37 @@ public class gameFrame extends JFrame {
         configureGui(dim);
         player1 = createPlayer("Player 1", Color.BLACK);
         player2 = createPlayer("Player 2", Color.RED);
-        board = new Board(player1, player2); // pass player1 and player2 to the constructor
+        board = new Board(player1, player2);
         if (board.isWonBy(player1)) {
             System.out.println("Player 1 wins!");
         }
         GridBagConstraints gbc = new GridBagConstraints();
         mainPanel.add(board, gbc);
-        add(mainPanel, BorderLayout.CENTER); // add the mainPanel to the center of the frame
+        add(mainPanel, BorderLayout.CENTER);
 
-        // Hide Board until Play is selected
         mainPanel.setVisible(isVisible);
 
         setSize(dim);
         setLocationRelativeTo(null);
         setVisible(true);
-        //resizeable false
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private void configureGui(Dimension dim) {
         // Top menu Area
-        var menuBar = new JMenuBar(); // Top menu Bar
-        var menuPanel = new JPanel(); // Panel within Bar
+        JMenuBar menuBar = new JMenuBar();
+        JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new BorderLayout());
-        menuPanel.add(new JLabel("     Game"), BorderLayout.WEST); // added Spacing for better viewing
+        menuPanel.add(new JLabel("     Game"), BorderLayout.WEST);
 
-        // toolbar ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Toolbar
         JToolBar toolbar = new JToolBar();
         JButton btn = new JButton();
         JButton btn2 = new JButton();
         JButton btn3 = new JButton();
-        JButton btn4 = new JButton(); // p2p
+        JButton btn4 = new JButton();
 
-        // Button Icons are incredibly microwaved but couldn't figure out how to resize button so resize image
         ImageIcon playIcon = new ImageIcon("res/PlayButton2Resized.png");
         ImageIcon aboutIcon = new ImageIcon("res/About.png");
         ImageIcon exitIcon = new ImageIcon("res/exit.png");
@@ -74,19 +68,16 @@ public class gameFrame extends JFrame {
         btn3.setFocusable(false);
         btn4.setFocusable(false);
 
-        // Icons
         btn.setIcon(playIcon);
         btn2.setIcon(aboutIcon);
         btn3.setIcon(exitIcon);
         btn4.setIcon(ConnectIcon);
 
-        // TooltipText
-        btn.setToolTipText("Start New Game"); // MUST START NEW GAME
+        btn.setToolTipText("Start New Game");
         btn2.setToolTipText("About info");
         btn3.setToolTipText("Exit");
         btn4.setToolTipText("Connect");
 
-        // Button Actions (!EDIT THESE FOR FUTURE ACTIONS!)
         btn4.addActionListener(e -> {
             if (p2pGame == null) {
                 int choice = JOptionPane.showOptionDialog(this, "Choose role:", "Role Selection", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{"Server", "Client"}, null);
@@ -119,13 +110,10 @@ public class gameFrame extends JFrame {
             }
         });
 
-
         btn.addActionListener(e -> {
-            // if game already running
-            if(isVisible){
+            if (isVisible) {
                 int answer = JOptionPane.showConfirmDialog(null, "Are you sure you'd like to start a new game?", "Confirmation", JOptionPane.YES_NO_OPTION);
-                // yes = 0, no = 1, X = -1
-                if(answer == 0){
+                if (answer == 0) {
                     board.clear();
                     isVisible = false;
                     mainPanel.setVisible(isVisible);
@@ -133,7 +121,6 @@ public class gameFrame extends JFrame {
                 }
             }
         });
-
 
         btn2.addActionListener(e -> {
             System.out.println("About selected");
@@ -147,15 +134,8 @@ public class gameFrame extends JFrame {
             JOptionPane.showMessageDialog(null, omokDescription, "About Omok", JOptionPane.INFORMATION_MESSAGE);
         });
 
-
-
-        btn3.addActionListener(e -> { // exit button works
+        btn3.addActionListener(e -> {
             this.dispose();
-        });
-
-        // EDIT this for Network Connection
-        btn4.addActionListener(e -> {
-            System.out.println("Connection Button Pressed TEST");
         });
 
         toolbar.add(btn);
@@ -163,11 +143,10 @@ public class gameFrame extends JFrame {
         toolbar.add(btn3);
         toolbar.add(btn4);
         menuPanel.add(toolbar, BorderLayout.SOUTH);
-        // end Toolbar ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Add Selection
-        var selectPanel = new JPanel();
-        var playButton = new JButton("Play");
+        JPanel selectPanel = new JPanel();
+        JButton playButton = new JButton("Play");
         playButton.setFocusable(false);
         playButton.setToolTipText("Start Game");
 
@@ -178,26 +157,24 @@ public class gameFrame extends JFrame {
         selectPanel.add(optionList);
 
         playButton.addActionListener(e -> {
-            if(!isVisible) {
-                // Make board Visible
+            if (!isVisible) {
                 isVisible = true;
                 mainPanel.setVisible(isVisible);
                 optionList.setEnabled(false);
             }
         });
 
-        optionList.addActionListener(e -> { // Possibly add on to this later
-            if(optionList.getSelectedItem() == "Computer"){ // Implement Bot?
+        optionList.addActionListener(e -> {
+            if (optionList.getSelectedItem() == "Computer") {
                 System.out.println("Computer was selected (TEST)");
             }
-            if(optionList.getSelectedItem() == "Human"){ // just continue?
+            if (optionList.getSelectedItem() == "Human") {
                 System.out.println("Human was selected (TEST)");
             }
         });
 
         setContentPane(selectPanel);
 
-        // put them together
         menuBar.add(menuPanel);
         setJMenuBar(menuBar);
     }
@@ -211,7 +188,19 @@ public class gameFrame extends JFrame {
         });
     }
 
-    /** create Player objects */
+    public Board getBoard() {
+        return board;
+    }
+
+    public Player getPlayer1() {
+        return player1;
+    }
+
+    public Player getPlayer2() {
+        return player2;
+    }
+
+
     public Player createPlayer(String name, Color color) {
         return new Player(name, color);
     }
