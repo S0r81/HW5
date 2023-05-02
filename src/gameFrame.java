@@ -120,7 +120,19 @@ public class gameFrame extends JFrame {
         });
 
 
-
+        btn.addActionListener(e -> {
+            // if game already running
+            if(isVisible){
+                int answer = JOptionPane.showConfirmDialog(null, "Are you sure you'd like to start a new game?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                // yes = 0, no = 1, X = -1
+                if(answer == 0){
+                    board.clear();
+                    isVisible = false;
+                    mainPanel.setVisible(isVisible);
+                    optionList.setEnabled(true);
+                }
+            }
+        });
 
 
         btn2.addActionListener(e -> {
