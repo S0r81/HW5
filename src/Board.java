@@ -17,6 +17,12 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
     private int columns;
     private int rows;
     private Player currentPlayer;
+    private MoveListener moveListener;
+
+    public void setMoveListener(MoveListener moveListener) {
+        this.moveListener = moveListener;
+    }
+
 
     public Board(Player player1, Player player2) {
         this(15, player1, player2);
@@ -183,12 +189,16 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
                 placeStone(closestX, closestY, currentPlayer);
                 repaint();
                 checkWinAndShowMessage();
+                if (moveListener != null) {
+                    moveListener.onMoveMade(closestX, closestY);
+                }
                 switchPlayer();
             } else {
                 JOptionPane.showMessageDialog(this, "This space is already occupied. Please choose another one.", "Invalid Move", JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
+
 
 
 
@@ -261,4 +271,5 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
         }
     }
 }
+
 

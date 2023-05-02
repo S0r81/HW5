@@ -186,6 +186,11 @@ public class gameFrame extends JFrame {
             isVisible = true;
             mainPanel.setVisible(isVisible);
             optionList.setEnabled(false);
+            board.setMoveListener((x, y) -> {
+                if (p2pGame != null && p2pGame.isLocalPlayerTurn()) {
+                    p2pGame.sendMove(x, y);
+                }
+            });
         });
     }
 

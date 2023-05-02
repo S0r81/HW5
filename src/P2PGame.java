@@ -3,7 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class P2PGame extends NetworkAdapter {
+public class P2PGame{
 
     private boolean isServer;
     private ServerSocket serverSocket;
@@ -17,12 +17,17 @@ public class P2PGame extends NetworkAdapter {
     private Player remotePlayer;
     private boolean isLocalPlayerTurn;
 
-    public P2PGame(boolean isServer, Socket socket, Runnable onConnectedCallback, gameFrame gameFrame) {
-        super(socket);
-        this.gameFrame = gameFrame;
+    public P2PGame(boolean isServer, Socket clientSocket, Runnable onConnectedCallback, gameFrame gameFrame) {
         this.isServer = isServer;
+        this.clientSocket = clientSocket;
         this.onConnectedCallback = onConnectedCallback;
+        this.gameFrame = gameFrame;
         board = gameFrame.getBoard();
+        board.setMoveListener((x, y) -> {
+            if (isLocalPlayerTurn) {
+                sendMove(x, y);
+            }
+        });
         if (isServer) {
             localPlayer = gameFrame.getPlayer1();
             remotePlayer = gameFrame.getPlayer2();
@@ -33,6 +38,7 @@ public class P2PGame extends NetworkAdapter {
             isLocalPlayerTurn = false;
         }
     }
+
 
     public void setOnConnectedCallback(Runnable onConnectedCallback) {
         this.onConnectedCallback = onConnectedCallback;
@@ -81,7 +87,19 @@ public class P2PGame extends NetworkAdapter {
 
     protected void onMessageReceived(String message) {
         System.out.println("Received message: " + message);
-        // Add your message handling code here
+        if (message.startsWith("MOVE:")) {
+            String[] parts = message.split(":");
+            int x = Integer.parseInt(parts[1]);
+            int y = Integer.parseInt(parts[2]);
+            processMove(x, y);
+        }
+    }
+
+    private void processMove(int x, int y) {
+        board.placeStone(x, y, remotePlayer);
+        board.repaint();
+        board.checkWinAndShowMessage();
+        isLocalPlayerTurn = !isLocalPlayerTurn;
     }
 
     private void sendMessage(String message) {
@@ -129,5 +147,14 @@ public class P2PGame extends NetworkAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isLocalPlayerTurn() {
+        return isLocalPlayerTurn;
+    }
+
+    public void sendMove(int x, int y) {
+        sendMessage("MOVE:" + x + ":" + y);
+        isLocalPlayerTurn = !isLocalPlayerTurn;
     }
 }
