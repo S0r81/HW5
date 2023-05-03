@@ -4,6 +4,8 @@ import java.net.Socket;
 
 public class P2PGame {
 
+    private int userPort;
+    private String userIp;
     private boolean isServer;
     private ServerSocket serverSocket;
     private Socket clientSocket;
@@ -24,9 +26,10 @@ public class P2PGame {
         initGame();
     }
 
-    public P2PGame(boolean isServer, Socket clientSocket, Runnable onConnectedCallback, gameFrame gameFrame) {
+    public P2PGame(boolean isServer, String userIp, int userPort, Runnable onConnectedCallback, gameFrame gameFrame) {
         this.isServer = isServer;
-        this.clientSocket = clientSocket;
+        this.userIp = userIp;
+        this.userPort = userPort;
         this.onConnectedCallback = onConnectedCallback;
         this.gameFrame = gameFrame;
         board = gameFrame.getBoard();
@@ -44,12 +47,8 @@ public class P2PGame {
             remotePlayer = gameFrame.getPlayer1();
             isLocalPlayerTurn = false;
         }
-
-        // Initialize the networkAdapter
-        this.networkAdapter = new NetworkAdapter(clientSocket);
-
-        initGame();
     }
+
 
 
 
@@ -60,10 +59,11 @@ public class P2PGame {
     public void start() {
         if (isServer && !serverStarted) {
             try {
-                serverSocket = new ServerSocket(0); // Choose an available port automatically
+                serverSocket = new ServerSocket(userPort); // Use the user-defined port
                 System.out.println("Server started on port: " + serverSocket.getLocalPort());
                 System.out.println("Waiting for client to connect...");
                 clientSocket = serverSocket.accept();
+                networkAdapter = new NetworkAdapter(clientSocket); // Initialize the networkAdapter
                 initGame();
                 System.out.println("Client connected: " + clientSocket.getInetAddress());
                 if (onConnectedCallback != null) {
@@ -75,12 +75,22 @@ public class P2PGame {
             }
         } else {
             // Client side
-            System.out.println("Connected to server: " + clientSocket.getInetAddress());
-            if (onConnectedCallback != null) {
-                onConnectedCallback.run();
+            try {
+                clientSocket = new Socket(userIp, userPort); // Use the user-defined IP and port
+                networkAdapter = new NetworkAdapter(clientSocket); // Initialize the networkAdapter
+                initGame();
+                System.out.println("Connected to server: " + clientSocket.getInetAddress());
+                if (onConnectedCallback != null) {
+                    onConnectedCallback.run();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
+
+
+
 
     private void initGame() {
         try {

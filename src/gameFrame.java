@@ -168,26 +168,21 @@ public class gameFrame extends JFrame {
                 int serverPort = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter server port:"));
                 if (choice == 0) { // Server
                     try {
-                        ServerSocket serverSocket = new ServerSocket(serverPort);
-                        System.out.println("Server started on port: " + serverSocket.getLocalPort());
-                        System.out.println("Waiting for client to connect...");
-                        Socket clientSocket = serverSocket.accept();
                         // Server
-                        P2PGame game = new P2PGame(true, clientSocket, this::onConnected, this);
+                        P2PGame game = new P2PGame(true, serverIp, serverPort, this::onConnected, this);
                         p2pGame = game;
                         game.start();
                         isConnected = true;
-                    } catch (IOException ex) {
+                    } catch (Exception ex) {
                         JOptionPane.showMessageDialog(this, "Could not start server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
                     }
                 } else { // Client
                     try {
-                        Socket socket = new Socket(serverIp, serverPort);
-                        P2PGame game = new P2PGame(false, socket, this::onConnected, this);
+                        P2PGame game = new P2PGame(false, serverIp, serverPort, this::onConnected, this);
                         p2pGame = game;
                         game.start();
                         isConnected = true;
-                    } catch (IOException ex) {
+                    } catch (Exception ex) {
                         JOptionPane.showMessageDialog(this, "Could not connect to server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -196,6 +191,7 @@ public class gameFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "You are already connected to a game.", "Connection Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
+
 
     private void onConnected() {
         SwingUtilities.invokeLater(() -> {
