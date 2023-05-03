@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -200,13 +201,21 @@ public class P2PGame {
 
     public void sendMove(int x, int y) {
         if (outputStream != null) {
-            networkAdapter.writeMove(x, y); // Send the move using the network adapter
-            // Comment out the following line as it will be updated when the MOVE_ACK message is received
-            // isLocalPlayerTurn = !isLocalPlayerTurn;
+            if (isLocalPlayerTurn) {
+                networkAdapter.writeMove(x, y); // Send the move using the network adapter
+                board.placeStone(x, y, localPlayer); // Place the stone on the board
+                board.repaint(); // Update the GUI
+                board.checkWinAndShowMessage(); // Check for a win and show a message if necessary
+                // Comment out the following line as it will be updated when the MOVE_ACK message is received
+                // isLocalPlayerTurn = !isLocalPlayerTurn;
+            } else {
+                JOptionPane.showMessageDialog(gameFrame, "Please wait your turn.");
+            }
         } else {
             System.err.println("Output stream not initialized. Cannot send move.");
         }
     }
+
 
 
     public void close() {
