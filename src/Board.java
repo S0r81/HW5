@@ -4,6 +4,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import javax.swing.*;
 
 public class Board extends JPanel implements MouseListener, MouseMotionListener{
@@ -17,11 +18,8 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
     private int columns;
     private int rows;
     private Player currentPlayer;
-    private MoveListener moveListener;
+    private BiFunction<Integer, Integer, Boolean> moveListener;
 
-    public void setMoveListener(MoveListener moveListener) {
-        this.moveListener = moveListener;
-    }
 
 
     public Board(Player player1, Player player2) {
@@ -177,26 +175,6 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-
-        // Find the closest intersection point
-        int closestX = (int) Math.round((double) x / cellSize);
-        int closestY = (int) Math.round((double) y / cellSize);
-
-        if (closestX >= 0 && closestX < columns && closestY >= 0 && closestY < rows) {
-            if (!isOccupied(closestX, closestY)) {
-                placeStone(closestX, closestY, currentPlayer);
-                repaint();
-                checkWinAndShowMessage();
-                if (moveListener != null) {
-                    moveListener.onMoveMade(closestX, closestY);
-                }
-                switchPlayer();
-            } else {
-                JOptionPane.showMessageDialog(this, "This space is already occupied. Please choose another one.", "Invalid Move", JOptionPane.INFORMATION_MESSAGE);
-            }
-        }
     }
 
 
@@ -209,8 +187,24 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (moveListener != null) {
+            int x = e.getX() / cellSize;
+            int y = e.getY() / cellSize;
 
+            if (x < columns && y < rows && board[x][y] == null) {
+                boolean moveAllowed = moveListener.apply(x, y);
+                if (moveAllowed) {
+                    placeStone(x, y, currentPlayer);
+                    checkWinAndShowMessage();
+                    switchPlayer();
+                    repaint();
+                }
+            }
+        }
     }
+
+
+
 
     @Override
     public void mouseReleased(MouseEvent e) {
@@ -258,6 +252,11 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
     public Dimension getPreferredSize() {
         return new Dimension(columns * cellSize, rows * cellSize);
     }
+
+    public void setConditionalMoveListener(BiFunction<Integer, Integer, Boolean> moveListener) {
+        this.moveListener = moveListener;
+    }
+
 
 
 

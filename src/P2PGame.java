@@ -33,10 +33,12 @@ public class P2PGame {
         this.onConnectedCallback = onConnectedCallback;
         this.gameFrame = gameFrame;
         board = gameFrame.getBoard();
-        board.setMoveListener((x, y) -> {
+        board.setConditionalMoveListener((x, y) -> {
             if (isLocalPlayerTurn) {
                 sendMove(x, y);
+                return true;
             }
+            return false;
         });
         if (isServer) {
             localPlayer = gameFrame.getPlayer1();

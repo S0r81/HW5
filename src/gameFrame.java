@@ -199,11 +199,17 @@ public class gameFrame extends JFrame {
             isVisible = true;
             mainPanel.setVisible(isVisible);
             optionList.setEnabled(false);
-            board.setMoveListener((x, y) -> {
+            board.setConditionalMoveListener((x, y) -> {
                 if (p2pGame != null && p2pGame.isLocalPlayerTurn()) {
                     p2pGame.sendMove(x, y);
+                    return true;
+                } else {
+                    JOptionPane.showMessageDialog(this, "Please wait your turn.", "Not Your Turn", JOptionPane.INFORMATION_MESSAGE);
+                    return false;
                 }
             });
+
+
             updateTurnStatus();
         });
     }
