@@ -60,7 +60,6 @@ public class gameFrame extends JFrame {
 
         // Toolbar
         JToolBar toolbar = new JToolBar();
-        toolbar.add(turnLabel);
         JButton btn = new JButton();
         JButton btn2 = new JButton();
         JButton btn3 = new JButton();
@@ -123,7 +122,9 @@ public class gameFrame extends JFrame {
         toolbar.add(btn2);
         toolbar.add(btn3);
         toolbar.add(btn4);
+        toolbar.add(turnLabel);
         menuPanel.add(toolbar, BorderLayout.SOUTH);
+
 
         // Add Selection
         JPanel selectPanel = new JPanel();
