@@ -168,8 +168,6 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
                 }
             }
         }
-
-
     }
 
 
@@ -177,8 +175,6 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
     public void mouseClicked(MouseEvent e) {
 
     }
-
-
 
 
 
