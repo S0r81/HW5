@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class P2PGame {
 
@@ -20,9 +19,9 @@ public class P2PGame {
 
     public P2PGame(Socket socket) {
         this.networkAdapter = new NetworkAdapter(socket);
+        isServer = false;
         initGame();
     }
-
 
     public P2PGame(boolean isServer, Socket clientSocket, Runnable onConnectedCallback, gameFrame gameFrame) {
         this.isServer = isServer;
@@ -44,36 +43,38 @@ public class P2PGame {
             remotePlayer = gameFrame.getPlayer1();
             isLocalPlayerTurn = false;
         }
+        initGame();
     }
-
 
     public void setOnConnectedCallback(Runnable onConnectedCallback) {
         this.onConnectedCallback = onConnectedCallback;
     }
 
     public void start() {
-        new Thread(() -> {
-            if (isServer) {
-                startServer();
-            } else {
-                startClient();
+        if (isServer) {
+            try {
+                serverSocket = new ServerSocket(0); // Choose an available port automatically
+                System.out.println("Server started on port: " + serverSocket.getLocalPort());
+                System.out.println("Waiting for client to connect...");
+                clientSocket = serverSocket.accept();
+                initGame();
+                System.out.println("Client connected: " + clientSocket.getInetAddress());
+                if (onConnectedCallback != null) {
+                    onConnectedCallback.run();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }).start();
+        }
     }
-
-
-    private void init(Socket socket) {
+    private void initGame() {
         try {
-            this.clientSocket = socket;
             this.inputStream = new DataInputStream(clientSocket.getInputStream());
             this.outputStream = new DataOutputStream(clientSocket.getOutputStream());
-            startReading();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    private void initGame() {
         networkAdapter.setMessageListener((type, x, y) -> {
             switch (type) {
                 case PLAY:
@@ -100,6 +101,7 @@ public class P2PGame {
             }
         });
         networkAdapter.receiveMessagesAsync();
+        startReading();
     }
 
 
@@ -145,45 +147,6 @@ public class P2PGame {
     private void sendMessage(String message) {
         try {
             outputStream.writeUTF(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void startServer() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter port to listen on: ");
-        int port = scanner.nextInt();
-
-        try {
-            serverSocket = new ServerSocket(port);
-            System.out.println("Server started on port: " + port);
-            System.out.println("Waiting for client to connect...");
-            clientSocket = serverSocket.accept();
-            init(clientSocket);
-            System.out.println("Client connected: " + clientSocket.getInetAddress());
-            if (onConnectedCallback != null) {
-                onConnectedCallback.run();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void startClient() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter server IP address: ");
-        String serverIp = scanner.nextLine();
-        System.out.println("Enter server port: ");
-        int serverPort = scanner.nextInt();
-
-        try {
-            clientSocket = new Socket(serverIp, serverPort);
-            init(clientSocket); // add this line to initialize the socket
-            System.out.println("Connected to server: " + serverIp + ":" + serverPort);
-            if (onConnectedCallback != null) {
-                onConnectedCallback.run();
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }

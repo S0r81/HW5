@@ -80,32 +80,7 @@ public class gameFrame extends JFrame {
 
         btn4.addActionListener(e -> {
             if (p2pGame == null) {
-                int choice = JOptionPane.showOptionDialog(this, "Choose role:", "Role Selection", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{"Server", "Client"}, null);
-                if (choice == 0 || choice == 1) {
-                    String serverIp = JOptionPane.showInputDialog(this, "Enter server IP address:");
-                    int serverPort = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter server port:"));
-                    if (choice == 0) { // Server
-                        try {
-                            ServerSocket serverSocket = new ServerSocket(serverPort);
-                            System.out.println("Server started on port: " + serverSocket.getLocalPort());
-                            System.out.println("Waiting for client to connect...");
-                            Socket clientSocket = serverSocket.accept();
-                            // Server
-                            P2PGame game = new P2PGame(true, clientSocket, this::onConnected, this);
-                            p2pGame = game;
-                            game.start();
-                        } catch (IOException ex) {
-                            JOptionPane.showMessageDialog(this, "Could not start server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    } else { // Client
-                        try {
-                            Socket socket = new Socket(serverIp, serverPort);
-                            P2PGame game = new P2PGame(socket);
-                        } catch (IOException ex) {
-                            JOptionPane.showMessageDialog(this, "Could not connect to server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                }
+                connect();
             }
         });
 
@@ -176,6 +151,37 @@ public class gameFrame extends JFrame {
 
         menuBar.add(menuPanel);
         setJMenuBar(menuBar);
+    }
+
+    private void connect() {
+        int choice = JOptionPane.showOptionDialog(this, "Choose role:", "Role Selection", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{"Server", "Client"}, null);
+        if (choice == 0 || choice == 1) {
+            String serverIp = JOptionPane.showInputDialog(this, "Enter server IP address:");
+            int serverPort = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter server port:"));
+            if (choice == 0) { // Server
+                try {
+                    ServerSocket serverSocket = new ServerSocket(serverPort);
+                    System.out.println("Server started on port: " + serverSocket.getLocalPort());
+                    System.out.println("Waiting for client to connect...");
+                    Socket clientSocket = serverSocket.accept();
+                    // Server
+                    P2PGame game = new P2PGame(true, clientSocket, this::onConnected, this);
+                    p2pGame = game;
+                    game.start();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Could not start server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else { // Client
+                try {
+                    Socket socket = new Socket(serverIp, serverPort);
+                    P2PGame game = new P2PGame(false, socket, this::onConnected, this);
+                    p2pGame = game;
+                    game.start();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Could not connect to server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
     }
 
     private void onConnected() {
