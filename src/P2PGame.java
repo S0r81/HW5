@@ -217,6 +217,7 @@ public class P2PGame {
         board.placeStone(x, y, localPlayer); // Place the stone on the board
         board.repaint(); // Update the GUI
         board.checkWinAndShowMessage(); // Check for a win and show a message if necessary
+        isLocalPlayerTurn = !isLocalPlayerTurn; // Update the turn regardless of the validity of the move
     }
 
 
