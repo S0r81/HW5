@@ -198,22 +198,27 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
         if (closestX >= 0 && closestX < columns && closestY >= 0 && closestY < rows) {
             if (!isOccupied(closestX, closestY)) {
                 if (moveListener == null) {
-                    placeStone(closestX, closestY, currentPlayer);
+                    if (currentPlayer == player1) {
+                        placeStone(closestX, closestY, player1);
+                    } else {
+                        placeStone(closestX, closestY, player2);
+                    }
                     checkWinAndShowMessage();
                     switchPlayer();
                     repaint();
                 } else {
-                    moveListener.apply(closestX, closestY);
-                    //print closestX and closestY
-                    System.out.println("closestX: " + closestX + " closestY: " + closestY);
-                    placeStone(closestX, closestY, currentPlayer);
-                    checkWinAndShowMessage();
-                    switchPlayer();
-                    repaint();
+                    boolean validMove = moveListener.apply(closestX, closestY);
+                    if (validMove) {
+                        placeStone(closestX, closestY, currentPlayer);
+                        checkWinAndShowMessage();
+                        switchPlayer();
+                        repaint();
+                    }
                 }
             }
         }
     }
+
 
 
 
