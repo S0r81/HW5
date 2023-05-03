@@ -16,6 +16,13 @@ public class P2PGame {
     private Player localPlayer;
     private Player remotePlayer;
     private boolean isLocalPlayerTurn;
+    private NetworkAdapter networkAdapter;
+
+    public P2PGame(Socket socket) {
+        this.networkAdapter = new NetworkAdapter(socket);
+        initGame();
+    }
+
 
     public P2PGame(boolean isServer, Socket clientSocket, Runnable onConnectedCallback, gameFrame gameFrame) {
         this.isServer = isServer;
@@ -66,6 +73,36 @@ public class P2PGame {
         }
     }
 
+    private void initGame() {
+        networkAdapter.setMessageListener((type, x, y) -> {
+            switch (type) {
+                case PLAY:
+                    // Handle PLAY message
+                    break;
+                case PLAY_ACK:
+                    // Handle PLAY_ACK message
+                    break;
+                case MOVE:
+                    // Handle MOVE message
+                    break;
+                case MOVE_ACK:
+                    // Handle MOVE_ACK message
+                    break;
+                case QUIT:
+                    // Handle QUIT message
+                    break;
+                case CLOSE:
+                    // Handle CLOSE message
+                    break;
+                case UNKNOWN:
+                    // Handle UNKNOWN message
+                    break;
+            }
+        });
+        networkAdapter.receiveMessagesAsync();
+    }
+
+
     protected void startReading() {
         Thread readingThread = new Thread(() -> {
             try {
@@ -91,9 +128,9 @@ public class P2PGame {
     protected void onMessageReceived(String message) {
         System.out.println("Received message: " + message);
         if (message.startsWith("MOVE:")) {
-            String[] parts = message.split(":");
-            int x = Integer.parseInt(parts[1]);
-            int y = Integer.parseInt(parts[2]);
+            String[] parts = message.substring(5).split(",");
+            int x = Integer.parseInt(parts[0]);
+            int y = Integer.parseInt(parts[1]);
             processMove(x, y);
         }
     }
@@ -158,9 +195,14 @@ public class P2PGame {
 
     public void sendMove(int x, int y) {
         if (outputStream != null) {
-            sendMessage(x + "," + y);
+            sendMessage("MOVE:" + x + "," + y);
         } else {
             System.err.println("Output stream not initialized. Cannot send move.");
         }
     }
+
+    public void close() {
+        networkAdapter.close();
+    }
+
 }
