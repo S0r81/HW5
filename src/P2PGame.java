@@ -181,12 +181,10 @@ public class P2PGame {
 
 
     private void processMove(int x, int y) {
-        if (isLocalPlayerTurn) {
-            board.placeStone(x, y, remotePlayer);
-            board.repaint();
-            board.checkWinAndShowMessage();
-            isLocalPlayerTurn = !isLocalPlayerTurn;
-        }
+        board.placeStone(x, y, remotePlayer);
+        board.repaint();
+        board.checkWinAndShowMessage();
+        isLocalPlayerTurn = !isLocalPlayerTurn;
     }
 
     private void sendMessage(String message) {
