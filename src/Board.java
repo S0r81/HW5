@@ -175,23 +175,7 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
 
-        // Find the closest intersection point
-        int closestX = (int) Math.round((double) x / cellSize);
-        int closestY = (int) Math.round((double) y / cellSize);
-
-        if (closestX >= 0 && closestX < columns && closestY >= 0 && closestY < rows) {
-            if (!isOccupied(closestX, closestY)) {
-                placeStone(closestX, closestY, currentPlayer);
-                repaint();
-                checkWinAndShowMessage();
-                switchPlayer();
-            } else {
-                JOptionPane.showMessageDialog(this, "This space is already occupied. Please choose another one.", "Invalid Move", JOptionPane.INFORMATION_MESSAGE);
-            }
-        }
     }
 
 
@@ -204,27 +188,33 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener{
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (moveListener != null) {
-            int x = e.getX();
-            int y = e.getY();
+        int x = e.getX();
+        int y = e.getY();
 
-            // Find the closest intersection point
-            int closestX = (int) Math.round((double) (x - cellSize / 2.0) / cellSize);
-            int closestY = (int) Math.round((double) (y - cellSize / 2.0) / cellSize);
+        // Find the closest intersection point
+        int closestX = (int) Math.round((double) x / cellSize);
+        int closestY = (int) Math.round((double) y / cellSize);
 
-            if (closestX >= 0 && closestX < columns && closestY >= 0 && closestY < rows) {
-                if (!isOccupied(closestX, closestY)) {
-                    boolean moveAllowed = moveListener.apply(closestX, closestY);
-                    if (moveAllowed) {
-                        placeStone(closestX, closestY, currentPlayer);
-                        checkWinAndShowMessage();
-                        switchPlayer();
-                        repaint();
-                    }
+        if (closestX >= 0 && closestX < columns && closestY >= 0 && closestY < rows) {
+            if (!isOccupied(closestX, closestY)) {
+                if (moveListener == null) {
+                    placeStone(closestX, closestY, currentPlayer);
+                    checkWinAndShowMessage();
+                    switchPlayer();
+                    repaint();
+                } else {
+                    moveListener.apply(closestX, closestY);
+                    //print closestX and closestY
+                    System.out.println("closestX: " + closestX + " closestY: " + closestY);
+                    placeStone(closestX, closestY, currentPlayer);
+                    checkWinAndShowMessage();
+                    switchPlayer();
+                    repaint();
                 }
             }
         }
     }
+
 
 
 
