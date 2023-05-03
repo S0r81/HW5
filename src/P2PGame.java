@@ -161,6 +161,11 @@ public class P2PGame {
             int x = Integer.parseInt(parts[0]);
             int y = Integer.parseInt(parts[1]);
             processMove(x, y);
+            // Send an acknowledgment message
+            sendMessage("MOVE_ACK");
+        } else if (message.startsWith("MOVE_ACK")) {
+            // Update the isLocalPlayerTurn variable when the acknowledgment is received
+            isLocalPlayerTurn = !isLocalPlayerTurn;
         }
     }
 
@@ -186,10 +191,13 @@ public class P2PGame {
     public void sendMove(int x, int y) {
         if (outputStream != null) {
             sendMessage("MOVE:" + x + "," + y);
+            // Comment out the following line as it will be updated when the acknowledgment message is received
+            // isLocalPlayerTurn = !isLocalPlayerTurn;
         } else {
             System.err.println("Output stream not initialized. Cannot send move.");
         }
     }
+
 
     public void close() {
         networkAdapter.close();
