@@ -14,6 +14,7 @@ public class gameFrame extends JFrame {
     private Player currentPlayer;
 
     JPanel mainPanel = new JPanel(new GridBagLayout());
+    JLabel turnLabel;
     String[] options = {"Human", "Computer"};
     JComboBox optionList = new JComboBox(options);
     boolean isVisible = false;
@@ -26,6 +27,8 @@ public class gameFrame extends JFrame {
         super("Omok");
         setLayout(new BorderLayout());
         configureGui(dim);
+        // Initialize the turn label
+        turnLabel = new JLabel("Turn: ");
         player1 = createPlayer("Player 1", Color.BLACK);
         player2 = createPlayer("Player 2", Color.RED);
         board = new Board(player1, player2);
@@ -37,6 +40,9 @@ public class gameFrame extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
 
         mainPanel.setVisible(isVisible);
+
+
+
 
         setSize(dim);
         setLocationRelativeTo(null);
@@ -54,6 +60,7 @@ public class gameFrame extends JFrame {
 
         // Toolbar
         JToolBar toolbar = new JToolBar();
+        toolbar.add(turnLabel);
         JButton btn = new JButton();
         JButton btn2 = new JButton();
         JButton btn3 = new JButton();
@@ -195,8 +202,17 @@ public class gameFrame extends JFrame {
                     p2pGame.sendMove(x, y);
                 }
             });
+            updateTurnStatus();
         });
     }
+    private void updateTurnStatus() {
+        if (p2pGame != null) {
+            currentPlayer = p2pGame.isLocalPlayerTurn() ? player1 : player2;
+            // Update the turn label to display the current player's name
+            turnLabel.setText("Turn: " + currentPlayer.getName());
+        }
+    }
+
 
     public Board getBoard() {
         return board;
