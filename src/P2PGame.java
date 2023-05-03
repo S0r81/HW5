@@ -165,8 +165,19 @@ public class P2PGame {
         } else if (message.startsWith("MOVE_ACK")) {
             // Update the isLocalPlayerTurn variable when the acknowledgment is received
             isLocalPlayerTurn = !isLocalPlayerTurn;
+        } else if (message.startsWith("PLAY_ACK")) {
+            String[] parts = message.substring(8).split(",");
+            boolean response = (parts[0].equals("1"));
+            boolean turn = (parts[1].equals("1"));
+            if (response) {
+                System.out.println("Play request accepted.");
+                isLocalPlayerTurn = turn;
+            } else {
+                System.out.println("Play request rejected.");
+            }
         }
     }
+
 
     private void processMove(int x, int y) {
         board.placeStone(x, y, remotePlayer);
