@@ -101,7 +101,6 @@ public class gameFrame extends JFrame {
                         try {
                             Socket socket = new Socket(serverIp, serverPort);
                             P2PGame game = new P2PGame(socket);
-
                         } catch (IOException ex) {
                             JOptionPane.showMessageDialog(this, "Could not connect to server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
                         }
