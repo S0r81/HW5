@@ -203,18 +203,22 @@ public class P2PGame {
         if (outputStream != null) {
             if (isLocalPlayerTurn) {
                 networkAdapter.writeMove(x, y); // Send the move using the network adapter
-                board.placeStone(x, y, localPlayer); // Place the stone on the board
-                board.repaint(); // Update the GUI
-                board.checkWinAndShowMessage(); // Check for a win and show a message if necessary
                 // Comment out the following line as it will be updated when the MOVE_ACK message is received
                 // isLocalPlayerTurn = !isLocalPlayerTurn;
             } else {
                 JOptionPane.showMessageDialog(gameFrame, "Please wait your turn.");
+                return; // Exit the method without updating the board and GUI
             }
         } else {
             System.err.println("Output stream not initialized. Cannot send move.");
+            return; // Exit the method without updating the board and GUI
         }
+        // If we reach this point, we have sent the move and can update the board and GUI
+        board.placeStone(x, y, localPlayer); // Place the stone on the board
+        board.repaint(); // Update the GUI
+        board.checkWinAndShowMessage(); // Check for a win and show a message if necessary
     }
+
 
 
 
