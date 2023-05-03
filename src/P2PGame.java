@@ -20,12 +20,6 @@ public class P2PGame {
     private NetworkAdapter networkAdapter;
     private boolean serverStarted;
 
-    public P2PGame(Socket socket) {
-        this.networkAdapter = new NetworkAdapter(socket);
-        isServer = false;
-        initGame();
-    }
-
     public P2PGame(boolean isServer, String userIp, int userPort, Runnable onConnectedCallback, gameFrame gameFrame) {
         this.isServer = isServer;
         this.userIp = userIp;
@@ -106,21 +100,25 @@ public class P2PGame {
             switch (type) {
                 case PLAY:
                     // Handle PLAY message
+                    networkAdapter.writePlayAck(true, isServer);
+                    // Acknowledge the play request
                     break;
                 case PLAY_ACK:
                     // Handle PLAY_ACK message
+                    isLocalPlayerTurn = (x == 1);
                     break;
                 case MOVE:
                     // Handle MOVE message
+                    processMove(x, y);
+                    networkAdapter.writeMoveAck(x, y); // Acknowledge the move
                     break;
                 case MOVE_ACK:
                     // Handle MOVE_ACK message
+                    isLocalPlayerTurn = !isLocalPlayerTurn;
                     break;
                 case QUIT:
                     // Handle QUIT message
-                    break;
-                case CLOSE:
-                    // Handle CLOSE message
+                    close();
                     break;
                 case UNKNOWN:
                     // Handle UNKNOWN message
@@ -130,6 +128,7 @@ public class P2PGame {
         networkAdapter.receiveMessagesAsync();
         startReading();
     }
+
 
 
     protected void startReading() {
@@ -190,8 +189,8 @@ public class P2PGame {
 
     public void sendMove(int x, int y) {
         if (outputStream != null) {
-            sendMessage("MOVE:" + x + "," + y);
-            // Comment out the following line as it will be updated when the acknowledgment message is received
+            networkAdapter.writeMove(x, y); // Send the move using the network adapter
+            // Comment out the following line as it will be updated when the MOVE_ACK message is received
             // isLocalPlayerTurn = !isLocalPlayerTurn;
         } else {
             System.err.println("Output stream not initialized. Cannot send move.");
