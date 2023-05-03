@@ -28,7 +28,7 @@ public class gameFrame extends JFrame {
         setLayout(new BorderLayout());
         configureGui(dim);
         // Initialize the turn label
-        turnLabel = new JLabel("Turn: ");
+
         player1 = createPlayer("Player 1", Color.BLACK);
         player2 = createPlayer("Player 2", Color.RED);
         board = new Board(player1, player2);
@@ -60,6 +60,7 @@ public class gameFrame extends JFrame {
 
         // Toolbar
         JToolBar toolbar = new JToolBar();
+        turnLabel = new JLabel("Turn: ");
         JButton btn = new JButton();
         JButton btn2 = new JButton();
         JButton btn3 = new JButton();
