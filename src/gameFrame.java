@@ -12,6 +12,7 @@ public class gameFrame extends JFrame {
     private Player player1;
     private Player player2;
     private Player currentPlayer;
+    private boolean isConnected;
 
     JPanel mainPanel = new JPanel(new GridBagLayout());
     JLabel turnLabel;
@@ -27,8 +28,6 @@ public class gameFrame extends JFrame {
         super("Omok");
         setLayout(new BorderLayout());
         configureGui(dim);
-        // Initialize the turn label
-
         player1 = createPlayer("Player 1", Color.BLACK);
         player2 = createPlayer("Player 2", Color.RED);
         board = new Board(player1, player2);
@@ -126,7 +125,6 @@ public class gameFrame extends JFrame {
         toolbar.add(turnLabel);
         menuPanel.add(toolbar, BorderLayout.SOUTH);
 
-
         // Add Selection
         JPanel selectPanel = new JPanel();
         JButton playButton = new JButton("Play");
@@ -163,33 +161,39 @@ public class gameFrame extends JFrame {
     }
 
     private void connect() {
-        int choice = JOptionPane.showOptionDialog(this, "Choose role:", "Role Selection", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{"Server", "Client"}, null);
-        if (choice == 0 || choice == 1) {
-            String serverIp = JOptionPane.showInputDialog(this, "Enter server IP address:");
-            int serverPort = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter server port:"));
-            if (choice == 0) { // Server
-                try {
-                    ServerSocket serverSocket = new ServerSocket(serverPort);
-                    System.out.println("Server started on port: " + serverSocket.getLocalPort());
-                    System.out.println("Waiting for client to connect...");
-                    Socket clientSocket = serverSocket.accept();
-                    // Server
-                    P2PGame game = new P2PGame(true, clientSocket, this::onConnected, this);
-                    p2pGame = game;
-                    game.start();
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(this, "Could not start server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } else { // Client
-                try {
-                    Socket socket = new Socket(serverIp, serverPort);
-                    P2PGame game = new P2PGame(false, socket, this::onConnected, this);
-                    p2pGame = game;
-                    game.start();
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(this, "Could not connect to server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+        if (!isConnected) {
+            int choice = JOptionPane.showOptionDialog(this, "Choose role:", "Role Selection", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{"Server", "Client"}, null);
+            if (choice == 0 || choice == 1) {
+                String serverIp = JOptionPane.showInputDialog(this, "Enter server IP address:");
+                int serverPort = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter server port:"));
+                if (choice == 0) { // Server
+                    try {
+                        ServerSocket serverSocket = new ServerSocket(serverPort);
+                        System.out.println("Server started on port: " + serverSocket.getLocalPort());
+                        System.out.println("Waiting for client to connect...");
+                        Socket clientSocket = serverSocket.accept();
+                        // Server
+                        P2PGame game = new P2PGame(true, clientSocket, this::onConnected, this);
+                        p2pGame = game;
+                        game.start();
+                        isConnected = true;
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(this, "Could not start server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else { // Client
+                    try {
+                        Socket socket = new Socket(serverIp, serverPort);
+                        P2PGame game = new P2PGame(false, socket, this::onConnected, this);
+                        p2pGame = game;
+                        game.start();
+                        isConnected = true;
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(this, "Could not connect to server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "You are already connected to a game.", "Connection Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
 

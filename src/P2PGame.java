@@ -16,6 +16,7 @@ public class P2PGame {
     private Player remotePlayer;
     private boolean isLocalPlayerTurn;
     private NetworkAdapter networkAdapter;
+    private boolean serverStarted;
 
     public P2PGame(Socket socket) {
         this.networkAdapter = new NetworkAdapter(socket);
@@ -57,7 +58,7 @@ public class P2PGame {
     }
 
     public void start() {
-        if (isServer) {
+        if (isServer && !serverStarted) {
             try {
                 serverSocket = new ServerSocket(0); // Choose an available port automatically
                 System.out.println("Server started on port: " + serverSocket.getLocalPort());
@@ -68,11 +69,19 @@ public class P2PGame {
                 if (onConnectedCallback != null) {
                     onConnectedCallback.run();
                 }
+                serverStarted = true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            // Client side
+            System.out.println("Connected to server: " + clientSocket.getInetAddress());
+            if (onConnectedCallback != null) {
+                onConnectedCallback.run();
+            }
         }
     }
+
     private void initGame() {
         try {
             this.inputStream = new DataInputStream(clientSocket.getInputStream());
