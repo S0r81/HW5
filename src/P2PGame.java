@@ -43,8 +43,14 @@ public class P2PGame {
             remotePlayer = gameFrame.getPlayer1();
             isLocalPlayerTurn = false;
         }
+
+        // Initialize the networkAdapter
+        this.networkAdapter = new NetworkAdapter(clientSocket);
+
         initGame();
     }
+
+
 
     public void setOnConnectedCallback(Runnable onConnectedCallback) {
         this.onConnectedCallback = onConnectedCallback;
